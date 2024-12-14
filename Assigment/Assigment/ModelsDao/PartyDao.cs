@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace Assigment.ModelsDao
 {
@@ -12,7 +11,7 @@ namespace Assigment.ModelsDao
         public string Name { get; set; } = string.Empty;
 
         public ICollection<UserDao> Users { get; } = [];
-        [JsonIgnore]
         public ICollection<ItemPartyDao> ItemParties { get; } = [];
+        public ICollection<InvolvedPartiesDao> InvolvedParties { get; } = [];
     }
 }

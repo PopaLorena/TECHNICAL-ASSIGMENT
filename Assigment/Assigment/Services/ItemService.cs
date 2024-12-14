@@ -16,40 +16,52 @@ namespace Assigment.Services
             this.userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             this.itemRepository = itemRepository ?? throw new ArgumentNullException(nameof(itemRepository));
         }
-        public async Task AddItem(Item item)
+
+        public async Task<Item> AddItem(Item item)
         {
-            var newItemId = await itemRepository.AddItem(item).ConfigureAwait(false);
             item.CreatedDate = DateTime.UtcNow;
-
-            if (item.IsShared == null) item.IsShared = false;
-
+            List<Guid> partyIds = [];
             if (item.PartyIds.Count != 0)
             {
                 foreach (var partyId in item.PartyIds)
                 {
                     if (await partyRepository.FindParty(partyId).ConfigureAwait(false) == null)
                         throw new KeyNotFoundException("One of the Parties was not found.");
+                    partyIds.Add(partyId);
                 }
-                await itemRepository.AddItemToParty(item.PartyIds, newItemId).ConfigureAwait(false);
             }
+            var newItemId = await itemRepository.AddItem(item).ConfigureAwait(false);
+            if(partyIds.Count != 0)
+                await itemRepository.AddItemToParty(partyIds, newItemId).ConfigureAwait(false);
+
+            return await itemRepository.GetItemById(newItemId).ConfigureAwait(false);
         }
 
         public async Task<List<Item>> GetAllItemsFromMyParty(string userEmail)
         {
-            var userDao = await userRepository.GetUserByEmail(userEmail).ConfigureAwait(false);
+            var user = await userRepository.GetUserByEmail(userEmail).ConfigureAwait(false);
 
-            return await itemRepository.GetAllItemsByPartyId(userDao.PartyId).ConfigureAwait(false);
+            return await itemRepository.GetAllItemsByPartyId(user.PartyId).ConfigureAwait(false);
         }
 
-        public async Task<List<Item>> GetFilteredAndSortedItems(Item item, string userEmail, string? sortBy, string? sortOrder)
+        public async Task<List<Item>> GetFilteredAndSortedItems(Item item, string userEmail)
         {
-            var userDao = await userRepository.GetUserByEmail(userEmail).ConfigureAwait(false);
+            if (item.SortBy is not ("Name" or "CreatedDate" or "IsShared"))
+            {
+                throw new ArgumentException($"Invalid value for SortBy. Allowed values are: 'Name', 'CreatedDate', 'IsShared'.");
+            }
+            if (item.SortOrder is not ("asc" or "desc"))
+            {
+                throw new ArgumentException($"Invalid value for SortOrder. Allowed values are: 'asc', 'desc'.");
+            }
 
-            var query = await itemRepository.GetAllItemsByPartyId(userDao.PartyId).ConfigureAwait(false);
+            var user = await userRepository.GetUserByEmail(userEmail).ConfigureAwait(false);
+
+            var query = await itemRepository.GetAllItemsByPartyId(user.PartyId).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(item.Name))
             {
-                query = query.Where(i => i.Name.Contains(item.Name)).ToList();
+                query = query.Where(i => i.Name!.Contains(item.Name)).ToList();
             }
             if (item.CreatedDate.HasValue)
             {
@@ -62,21 +74,21 @@ namespace Assigment.Services
             }
 
             // Apply sorting
-            if (sortBy == "Name")
+            if (item.SortBy == "Name")
             {
-                query = sortOrder == "asc"
+                query = item.SortOrder == "asc"
                 ? query.OrderBy(i => i.Name).ToList()
                     : query.OrderByDescending(i => i.Name).ToList();
             }
-            else if (sortBy == "CreatedDate")
+            else if (item.SortBy == "CreatedDate")
             {
-                query = sortOrder == "asc"
+                query = item.SortOrder == "asc"
                 ? query.OrderBy(i => i.CreatedDate).ToList()
                     : query.OrderByDescending(i => i.CreatedDate).ToList();
             }
-            else if (sortBy == "IsShared")
+            else if (item.SortBy == "IsShared")
             {
-                query = sortOrder == "asc"
+                query = item.SortOrder == "asc"
                 ? query.OrderBy(i => i.IsShared).ToList()
                     : query.OrderByDescending(i => i.IsShared).ToList();
             }

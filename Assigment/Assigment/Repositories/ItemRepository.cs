@@ -29,6 +29,29 @@ namespace Assigment.Repositories
             return itemDao.Id;
         }
 
+        public async Task<List<Item>> GetAllItemsByPartyId(Guid partyId)
+        {
+            var partyWithItems = await context.Parties.Where(p => p.Id == partyId)
+            .Include(p => p.ItemParties)
+            .ThenInclude(ip => ip.Item)
+            .FirstOrDefaultAsync();
+
+            if (partyWithItems == null)
+            {
+                throw new KeyNotFoundException("The party not found.");
+            }
+
+            var itemsDao = partyWithItems.ItemParties.Select(ip => ip.Item).ToList();
+
+            return mapper.Map<List<Item>>(itemsDao);
+        }
+
+        public async Task<Item> GetItemById(Guid newItemId)
+        {
+            var itemsDao = await context.Items.FirstOrDefaultAsync(i => i.Id == newItemId).ConfigureAwait(false);
+            return mapper.Map<Item>(itemsDao);
+        }
+
         public async Task AddItemToParty(List<Guid> partyIds, Guid newItemId)
         {
             foreach (var partyId in partyIds)
@@ -40,23 +63,6 @@ namespace Assigment.Repositories
                 }).ConfigureAwait(false);
             }
             await context.SaveChangesAsync().ConfigureAwait(false);
-        }
-
-        public async Task<List<Item>> GetAllItemsByPartyId(Guid partyId)
-        {
-            var partyWithItems = await context.Parties.Where(p => p.Id == partyId)
-            .Include(p => p.ItemParties)
-            .ThenInclude(ip => ip.Item)
-            .FirstOrDefaultAsync();
-
-            if (partyWithItems == null)
-            {
-                throw new KeyNotFoundException("Party not found.");
-            }
-
-            var itemsDao = partyWithItems.ItemParties.Select(ip => ip.Item).ToList();
-
-            return mapper.Map<List<Item>>(itemsDao);
         }
     }
 }

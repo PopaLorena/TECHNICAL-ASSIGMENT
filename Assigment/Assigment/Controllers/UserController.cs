@@ -1,8 +1,10 @@
 ﻿using Assigment.Interfaces.ServiceInterfaces;
 using Assigment.Models;
-using Assigment.ModelsDto;
+using Assigment.ModelsDto.CreateModels;
+using Assigment.ModelsDto.GetModels;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Assigment.Controllers
 {
@@ -20,11 +22,11 @@ namespace Assigment.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult> Login(UserDto userDto)
+        public async Task<ActionResult> Login(LoginUserDto loginUserDto)
         {
             try
             {
-                var user = mapper.Map<UserModel>(userDto);
+                var user = mapper.Map<UserModel>(loginUserDto);
                 var token = await userService.Login(user).ConfigureAwait(false);
                 return Ok(token);
             }
@@ -39,18 +41,18 @@ namespace Assigment.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> Register(UserDto userDto)
+        public async Task<ActionResult> Register(CreateUserDto CreateUserDto)
         {
-
             try
             {
-                var user = mapper.Map<UserModel>(userDto);
-                await userService.Register(user).ConfigureAwait(false);
-                return Created();
+                var user = mapper.Map<UserModel>(CreateUserDto);
+                user = await userService.Register(user).ConfigureAwait(false);
+                var userDto = mapper.Map<UserDto>(user);
+                return Ok(userDto);
             }
-            catch (InvalidOperationException e)
+            catch (DbUpdateException)
             {
-                return BadRequest(e.Message);
+                return BadRequest("The email is used by another user");
             }
             catch (Exception e)
             {

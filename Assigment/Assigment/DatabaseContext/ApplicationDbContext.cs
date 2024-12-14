@@ -15,10 +15,30 @@ namespace Assigment.DatabaseContext
         public DbSet<ItemPartyDao> ItemParties { get; set; } = null!;
         public DbSet<ProposalDao> Proposals { get; set; } = null!;
         public DbSet<CounterProposalDao> CounterProposal { get; set; } = null!;
+        public DbSet<InvolvedPartiesDao> InvolvedParties { get; set; } = null!;
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-           // Configure party-user relationship
+            // Configure InvolvedParties-party relationship
+            modelBuilder.Entity<PartyDao>()
+              .HasMany(p => p.InvolvedParties)
+              .WithOne()
+              .HasForeignKey(u => u.PartyId);
+
+            // Configure InvolvedParties-Proposal relationship
+            modelBuilder.Entity<ProposalDao>()
+              .HasMany(p => p.InvolvedParties)
+              .WithOne()
+              .HasForeignKey(u => u.ProposalId);
+
+            // Configure InvolvedParties-CounterProposal relationship
+            modelBuilder.Entity<CounterProposalDao>()
+              .HasMany(cp => cp.InvolvedParties)
+              .WithOne()
+              .HasForeignKey(u => u.CounterProposalId);
+              
+            // Configure party-user relationship
             modelBuilder.Entity<PartyDao>()
                .HasMany(p => p.Users)
                .WithOne()
@@ -53,7 +73,8 @@ namespace Assigment.DatabaseContext
             modelBuilder.Entity<ProposalDao>()
                 .HasMany(pr => pr.CounterProposals)
                 .WithOne()
-                .HasForeignKey(pr => pr.ProposalId);
+                .HasForeignKey(pr => pr.ProposalId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Configure CounterProposal-user relationship
             modelBuilder.Entity<UserDao>()
@@ -61,6 +82,19 @@ namespace Assigment.DatabaseContext
                 .WithOne()
                 .HasForeignKey(p => p.CreatedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure Unique props
+            modelBuilder.Entity<ItemDao>()
+                .HasIndex(i => i.Name)
+                .IsUnique();
+
+            modelBuilder.Entity<UserDao>()
+                .HasIndex(i => i.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<PartyDao>()
+                .HasIndex(i => i.Name)
+                .IsUnique();
 
             base.OnModelCreating(modelBuilder);
         }

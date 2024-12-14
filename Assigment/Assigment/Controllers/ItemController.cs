@@ -1,18 +1,18 @@
 ﻿using Assigment.Interfaces.ServiceInterfaces;
 using Assigment.Models;
-using Assigment.ModelsDto;
-using Assigment.Services;
+using Assigment.ModelsDto.CreateModels;
+using Assigment.ModelsDto.GetModels;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace Assigment.Controllers
 {
     [Route("api/item")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class ItemController : ControllerBase
     {
         private readonly IItemService itemService;
@@ -26,18 +26,34 @@ namespace Assigment.Controllers
 
         [HttpGet]
         [Route("filterItems")]
-        public async Task<IActionResult> GetItems([FromQuery] ItemDto itemDto, [FromQuery] string? SortBy, [FromQuery] string? SortOrder)
+        public async Task<IActionResult> GetItems([FromQuery] ItemFilterDto itemFilterDto)
         {
-            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
-            if (userEmail == null)
+            try
             {
-                return Unauthorized("User not found.");
-            }
-            var item = mapper.Map<Item>(itemDto);
-            var itemsQuery = await itemService.GetFilteredAndSortedItems(item, userEmail, SortBy, SortOrder).ConfigureAwait(false);
-            var itemsDto = mapper.Map<List<ItemDto>>(itemsQuery);
+                var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+                if (userEmail == null)
+                {
+                    return Unauthorized("User not found.");
+                }
+                var item = mapper.Map<Item>(itemFilterDto);
+                var items = await itemService.GetFilteredAndSortedItems(item, userEmail).ConfigureAwait(false);
+                var itemsDto = mapper.Map<List<ItemDto>>(items);
 
-            return Ok(itemsDto);
+                return Ok(itemsDto);
+
+            }
+            catch(ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (KeyNotFoundException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
 
         [HttpGet]
@@ -55,29 +71,36 @@ namespace Assigment.Controllers
                 var itemsDto = mapper.Map<List<ItemDto>>(items);
                 return Ok(itemsDto);
             }
-            catch (InvalidOperationException e)
+            catch (KeyNotFoundException e)
             {
                 return BadRequest(e.Message);
             }
             catch (Exception e)
             {
-                return StatusCode(500, e);
+                return StatusCode(500, e.Message);
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateItem(ItemDto itemDto)
+        public async Task<IActionResult> CreateItem(CreateItemDto createItemDto)
         {
             try
             {
-                var item = mapper.Map<Item>(itemDto);
-                await itemService.AddItem(item).ConfigureAwait(false);
+                var item = mapper.Map<Item>(createItemDto);
 
-                return Created();
+                var newItem = await itemService.AddItem(item).ConfigureAwait(false);
+
+                var itemDto = mapper.Map<ItemDto>(newItem);
+
+                return Ok(itemDto);
             }
-            catch (InvalidOperationException e)
+            catch (KeyNotFoundException e)
             {
-                return BadRequest(e.Message);
+                return NotFound(e.Message);
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest("The name of the item is already used");
             }
             catch (Exception e)
             {

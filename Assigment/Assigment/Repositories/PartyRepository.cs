@@ -17,14 +17,17 @@ namespace Assigment.Repositories
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task AddParty(Party party)
+        public async Task<Party> AddParty(Party party)
         {
             var partyDao = mapper.Map<PartyDao>(party);
+
             await context.Parties.AddAsync(partyDao).ConfigureAwait(false);
             await context.SaveChangesAsync().ConfigureAwait(false);
+
+            return mapper.Map<Party>(partyDao);
         }
 
-        public async Task<Party> FindParty(Guid partyId)
+        public async Task<Party?> FindParty(Guid partyId)
         {
             var partyDao = await context.Parties.FirstOrDefaultAsync(p => p.Id == partyId).ConfigureAwait(false);
 

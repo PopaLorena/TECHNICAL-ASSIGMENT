@@ -24,7 +24,11 @@ namespace Assigment.Services
         public async Task<string> Login(UserModel user)
         {
             var userDao = await userRepository.GetUserByEmail(user.Email).ConfigureAwait(false);
-            if (!VerifyPasswordHask(user.Password, userDao.PasswordHash, userDao.PasswordSalt))
+
+            if (userDao == null)
+                throw new InvalidOperationException("Wrong credentials");
+
+            if (!VerifyPasswordHask(user.Password, userDao.PasswordHash!, userDao.PasswordSalt!))
             {
                 throw new InvalidOperationException("Wrong credentials");
             }
@@ -32,7 +36,7 @@ namespace Assigment.Services
             return CreateToken(user);
         }
 
-        public async Task Register(UserModel user)
+        public async Task<UserModel> Register(UserModel user)
         {
             CreatePassworHash(user.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
@@ -44,7 +48,7 @@ namespace Assigment.Services
                 Email = user.Email,
                 PartyId = user.PartyId
             };
-            await userRepository.register(userDao).ConfigureAwait(false);
+            return await userRepository.Register(userDao).ConfigureAwait(false);
         }
 
         private string CreateToken(UserModel user)

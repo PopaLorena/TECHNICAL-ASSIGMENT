@@ -1,4 +1,4 @@
-﻿namespace Assigment.ModelsDto
+﻿namespace Assigment.ModelsDto.GetModels
 {
     public class ItemPartyDto
     {

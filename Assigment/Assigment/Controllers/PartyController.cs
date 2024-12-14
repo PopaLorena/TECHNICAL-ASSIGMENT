@@ -1,8 +1,10 @@
 ﻿using Assigment.Interfaces.ServiceInterfaces;
 using Assigment.Models;
-using Assigment.ModelsDto;
+using Assigment.ModelsDto.CreateModels;
+using Assigment.ModelsDto.GetModels;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Assigment.Controllers
 {
@@ -20,18 +22,19 @@ namespace Assigment.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateParty(PartyDto partyDto)
+        public async Task<IActionResult> CreateParty(CreatePartyDto createPartyDto)
         {
             try
             {
-                var party = mapper.Map<Party>(partyDto);
-                await partyService.AddParty(party).ConfigureAwait(false);
+                var party = mapper.Map<Party>(createPartyDto);
+                party = await partyService.AddParty(party).ConfigureAwait(false);
 
-                return Created();
+                var partyDto = mapper.Map<PartyDto>(party);
+                return Ok(partyDto);
             }
-            catch (InvalidOperationException e)
+            catch(DbUpdateException)
             {
-                return BadRequest(e.Message);
+                return BadRequest("The name of the party is already used");
             }
             catch (Exception e)
             {

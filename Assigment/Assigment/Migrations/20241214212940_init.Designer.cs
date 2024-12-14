@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Assigment.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241214113059_Init")]
-    partial class Init
+    [Migration("20241214212940_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,11 +31,19 @@ namespace Assigment.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("CreatedByUserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("IsAccepted")
-                        .HasColumnType("bit");
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Payment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ProposalId")
                         .HasColumnType("uniqueidentifier");
@@ -47,6 +55,38 @@ namespace Assigment.Migrations
                     b.HasIndex("ProposalId");
 
                     b.ToTable("CounterProposal");
+                });
+
+            modelBuilder.Entity("Assigment.ModelsDao.InvolvedPartiesDao", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AcceptedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CounterProposalId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool?>("IsAccepted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("PartyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProposalId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CounterProposalId");
+
+                    b.HasIndex("PartyId");
+
+                    b.HasIndex("ProposalId");
+
+                    b.ToTable("InvolvedParties");
                 });
 
             modelBuilder.Entity("Assigment.ModelsDao.ItemDao", b =>
@@ -63,9 +103,12 @@ namespace Assigment.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Items");
                 });
@@ -84,6 +127,8 @@ namespace Assigment.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ItemId");
+
                     b.HasIndex("PartyId");
 
                     b.ToTable("ItemParties");
@@ -97,9 +142,12 @@ namespace Assigment.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Parties");
                 });
@@ -119,9 +167,6 @@ namespace Assigment.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool?>("IsAccepted")
-                        .HasColumnType("bit");
 
                     b.Property<Guid>("ItemId")
                         .HasColumnType("uniqueidentifier");
@@ -147,7 +192,7 @@ namespace Assigment.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -166,6 +211,9 @@ namespace Assigment.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.HasIndex("PartyId");
 
                     b.ToTable("Users");
@@ -182,6 +230,27 @@ namespace Assigment.Migrations
                     b.HasOne("Assigment.ModelsDao.ProposalDao", null)
                         .WithMany("CounterProposals")
                         .HasForeignKey("ProposalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Assigment.ModelsDao.InvolvedPartiesDao", b =>
+                {
+                    b.HasOne("Assigment.ModelsDao.CounterProposalDao", null)
+                        .WithMany("InvolvedParties")
+                        .HasForeignKey("CounterProposalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Assigment.ModelsDao.PartyDao", null)
+                        .WithMany("InvolvedParties")
+                        .HasForeignKey("PartyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Assigment.ModelsDao.ProposalDao", null)
+                        .WithMany("InvolvedParties")
+                        .HasForeignKey("ProposalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -190,19 +259,17 @@ namespace Assigment.Migrations
                 {
                     b.HasOne("Assigment.ModelsDao.ItemDao", "Item")
                         .WithMany("ItemParties")
-                        .HasForeignKey("PartyId")
+                        .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Assigment.ModelsDao.PartyDao", "Party")
+                    b.HasOne("Assigment.ModelsDao.PartyDao", null)
                         .WithMany("ItemParties")
                         .HasForeignKey("PartyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Item");
-
-                    b.Navigation("Party");
                 });
 
             modelBuilder.Entity("Assigment.ModelsDao.ProposalDao", b =>
@@ -229,6 +296,11 @@ namespace Assigment.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Assigment.ModelsDao.CounterProposalDao", b =>
+                {
+                    b.Navigation("InvolvedParties");
+                });
+
             modelBuilder.Entity("Assigment.ModelsDao.ItemDao", b =>
                 {
                     b.Navigation("ItemParties");
@@ -238,6 +310,8 @@ namespace Assigment.Migrations
 
             modelBuilder.Entity("Assigment.ModelsDao.PartyDao", b =>
                 {
+                    b.Navigation("InvolvedParties");
+
                     b.Navigation("ItemParties");
 
                     b.Navigation("Users");
@@ -246,6 +320,8 @@ namespace Assigment.Migrations
             modelBuilder.Entity("Assigment.ModelsDao.ProposalDao", b =>
                 {
                     b.Navigation("CounterProposals");
+
+                    b.Navigation("InvolvedParties");
                 });
 
             modelBuilder.Entity("Assigment.ModelsDao.UserDao", b =>

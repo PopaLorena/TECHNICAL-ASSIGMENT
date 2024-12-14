@@ -4,6 +4,6 @@ namespace Assigment.Interfaces.ServiceInterfaces
 {
     public interface IPartyService
     {
-        Task AddParty(Party party);
+        Task<Party> AddParty(Party party);
     }
 }

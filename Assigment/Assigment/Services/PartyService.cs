@@ -13,9 +13,9 @@ namespace Assigment.Services
             this.partyRepository = partyRepository ?? throw new ArgumentNullException(nameof(partyRepository));
         }
 
-        public async Task AddParty(Party party)
+        public async Task<Party> AddParty(Party party)
         {
-            await partyRepository.AddParty(party).ConfigureAwait(false);
+            return await partyRepository.AddParty(party).ConfigureAwait(false);
         }
     }
 }

@@ -4,10 +4,9 @@
     {
         public Guid Id { get; set; } 
         public Guid ProposalId { get; set; } 
-        public Guid CreatedByUserId { get; set; } 
-        public bool? IsAccepted { get; set; } // Null = pending, true = accepted, false = rejected
+        public Guid CreatedByUserId { get; set; }
+        public string CreatedByUser { get; set; } = string.Empty;
 
-        public Proposal Proposal { get; set; } = null!; 
-        public UserModel CreatedByUser { get; set; } = null!; 
+        public List<InvolvedParties> InvolvedParties { get; set; } = [];
     }
 }
