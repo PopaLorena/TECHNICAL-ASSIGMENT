@@ -1,6 +1,6 @@
-﻿namespace Assigment.Models
+﻿namespace Assigment.ModelsDto
 {
-    public class Party
+    public class PartyDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;

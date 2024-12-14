@@ -1,54 +1,66 @@
-﻿using Assigment.Models;
+﻿using Assigment.ModelsDao;
 using Microsoft.EntityFrameworkCore;
 
 namespace Assigment.DatabaseContext
 {
     public class ApplicationDbContext : DbContext
     {
-        public DbSet<User> Users { get; set; } = null!;
-        public DbSet<Party> Parties { get; set; } = null!;
-        public DbSet<Item> Items { get; set; } = null!;
-        public DbSet<ItemParty> ItemParties { get; set; } = null!;
-        public DbSet<Proposal> Proposals { get; set; } = null!;
-        public DbSet<ProposalResponse> ProposalResponses { get; set; } = null!;
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+       : base(options)
+        {
+        }
+        public DbSet<UserDao> Users { get; set; } = null!;
+        public DbSet<PartyDao> Parties { get; set; } = null!;
+        public DbSet<ItemDao> Items { get; set; } = null!;
+        public DbSet<ItemPartyDao> ItemParties { get; set; } = null!;
+        public DbSet<ProposalDao> Proposals { get; set; } = null!;
+        public DbSet<CounterProposalDao> CounterProposal { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configure many-to-many relationship for Item and Party
-            modelBuilder.Entity<ItemParty>()
-                .HasKey(ip => new { ip.ItemId, ip.PartyId });
+           // Configure party-user relationship
+            modelBuilder.Entity<PartyDao>()
+               .HasMany(p => p.Users)
+               .WithOne()
+               .HasForeignKey(u => u.PartyId);
 
-            modelBuilder.Entity<ItemParty>()
-                .HasOne(ip => ip.Item)
-                .WithMany(i => i.ItemParties)
-                .HasForeignKey(ip => ip.ItemId);
-
-            modelBuilder.Entity<ItemParty>()
-                .HasOne(ip => ip.Party)
-                .WithMany(p => p.Items)
+            // Configure party-item relationship
+            modelBuilder.Entity<PartyDao>()
+                .HasMany(p => p.ItemParties)
+                .WithOne()
                 .HasForeignKey(ip => ip.PartyId);
 
-            // Configure Proposal relationships
-            modelBuilder.Entity<Proposal>()
-                .HasOne(p => p.Item)
-                .WithMany(i => i.Proposals)
+            modelBuilder.Entity<ItemDao>()
+                .HasMany(p => p.ItemParties)
+                .WithOne(i => i.Item)
+                .HasForeignKey(ip => ip.ItemId);
+
+            // Configure item-Proposal relationship
+
+            modelBuilder.Entity<ItemDao>()
+                .HasMany(i => i.Proposals)
+                .WithOne()
                 .HasForeignKey(p => p.ItemId);
 
-            modelBuilder.Entity<Proposal>()
-                .HasOne(p => p.CreatedByUser)
-                .WithMany()
-                .HasForeignKey(p => p.CreatedByUserId);
+            // Configure Proposal-user relationship
+            modelBuilder.Entity<UserDao>()
+                .HasMany(u => u.Proposals)
+                .WithOne()
+                .HasForeignKey(p => p.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure ProposalResponse relationships
-            modelBuilder.Entity<ProposalResponse>()
-                .HasOne(pr => pr.Proposal)
-                .WithMany(p => p.Responses)
+            // Configure Proposal-CounterProposal relationships
+            modelBuilder.Entity<ProposalDao>()
+                .HasMany(pr => pr.CounterProposals)
+                .WithOne()
                 .HasForeignKey(pr => pr.ProposalId);
 
-            modelBuilder.Entity<ProposalResponse>()
-                .HasOne(pr => pr.Party)
-                .WithMany()
-                .HasForeignKey(pr => pr.PartyId);
+            // Configure CounterProposal-user relationship
+            modelBuilder.Entity<UserDao>()
+                .HasMany(u => u.CounterProposals)
+                .WithOne()
+                .HasForeignKey(p => p.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
         }

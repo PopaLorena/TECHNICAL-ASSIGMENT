@@ -20,5 +20,5 @@ jobs:
 
       - name: Build
         run: |
-          .\build-solution.bat
+          cmd.exe /c ".\build-solution.bat"
           
