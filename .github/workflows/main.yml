@@ -18,9 +18,6 @@ jobs:
       with:
         dotnet-version: '8.0.x'  
 
-    - name: Install dependencies
-      run: dotnet restore
-
     - name: Run Build Script
       run: |
         pwsh ./build-app.ps1  
