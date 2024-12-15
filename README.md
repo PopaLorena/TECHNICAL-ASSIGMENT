@@ -1,5 +1,5 @@
 # TECHNICAL-ASSIGMENT
-
+[![TECHNICAL-ASSIGMENT workflow](https://github.com/PopaLorena/TECHNICAL-ASSIGMENT/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/PopaLorena/TECHNICAL-ASSIGMENT/actions/workflows/main.yml?query=branch%3Amain)
 This project is a backend application designed to manage negotiations, proposals, counterproposals, and related entities (parties, items, users). It facilitates communication and interactions between parties within a negotiation context, supporting features such as user authentication, proposal management, and handling counterproposals.
 
 ## Features

@@ -13,7 +13,7 @@ dotnet build ./Assigment/Assigment.sln --configuration Release
 
 # Run tests (optional, if you have test projects)
 Write-Host "Running tests..."
-dotnet test ./Assigment/Assigment.sln --configuration Release --logger "junit;LogFileName=test-results.xml"
+dotnet test ./Assigment/Assigment.sln --configuration Release --logger "trx;LogFileName=test-results.trx"
 
 
 Write-Host "Build process completed successfully."

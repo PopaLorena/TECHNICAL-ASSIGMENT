@@ -22,9 +22,13 @@ jobs:
       run: |
         pwsh ./build-app.ps1  
         
-    - name: Convert JUnit XML to CTRF JSON
-      run: |
-        npx junit-to-ctrf TECHNICAL-ASSIGMENT/Assigment/AssigmentTests/TestResults/test-results.xml ctrf/ctrf-report.json
+    - name: Publish Test Results
+      uses: microsoft/test-results-action@v2
+      with:
+        test-results: 'TECHNICAL-ASSIGMENT/Assigment/AssigmentTests/TestResults/test-results.trx'
 
-    - name: Publish Test Summary Results
-      run: npx github-actions-ctrf ctrf/ctrf-report.json   
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: TECHNICAL-ASSIGMENT/Assigment/AssigmentTests/TestResults/test-results.trx
