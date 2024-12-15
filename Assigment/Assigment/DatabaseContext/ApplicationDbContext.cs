@@ -99,10 +99,6 @@ namespace Assigment.DatabaseContext
                 .HasIndex(i => i.Name)
                 .IsUnique();
 
-            modelBuilder.Entity<ProposalDao>()
-               .HasIndex(i => i.ItemId)
-               .IsUnique();
-
             base.OnModelCreating(modelBuilder);
         }
     }

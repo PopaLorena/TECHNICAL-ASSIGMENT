@@ -35,7 +35,7 @@ namespace Assigment.Services
 
             var proposal = await proposalRepository.GetProposalById(proposalId).ConfigureAwait(false);
 
-            ValidateProposal(proposal, user.PartyId, respons);
+            ValidateProposal(proposal, user.Id, respons);
 
             involvedParty = proposal.InvolvedParties.FirstOrDefault(ip => ip.PartyId == user!.PartyId);
 

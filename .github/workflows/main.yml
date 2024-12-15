@@ -25,9 +25,3 @@ jobs:
     - name: Run tests and generate TRX report
       run: |
         dotnet test ./Assigment/Assigment.sln --configuration Release --logger "trx;LogFileName=test-results.trx"
-    
-    - name: Upload test results
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-results
-        path: D:\a\TECHNICAL-ASSIGMENT\TECHNICAL-ASSIGMENT\Assigment\AssigmentTests\TestResults\test-results.trx

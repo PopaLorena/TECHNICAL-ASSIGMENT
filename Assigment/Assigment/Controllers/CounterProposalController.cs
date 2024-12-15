@@ -47,7 +47,7 @@ namespace Assigment.Controllers
         [HttpPost]
         [Consumes("application/json")]
         [Produces("application/json")]
-        [SwaggerOperation(Summary = "Creates a new counter proposal", Description = "Creates a new counter proposal based on the provided details.")]
+        [SwaggerOperation(Summary = "Creates a new counter proposal", Description = "This endpoint allows the creation of a new counter proposal. The request body must contain all the required information for the counter proposal. If successful, it returns the details of the created counter proposal.")]
         [SwaggerResponse(200, "Successfully created counter proposal", typeof(CounterProposalDto))]
         [SwaggerResponse(400, "Bad request due to invalid input")]
         [SwaggerResponse(401, "Unauthorized if user is not found")]

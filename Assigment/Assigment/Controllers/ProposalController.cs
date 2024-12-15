@@ -99,13 +99,13 @@ namespace Assigment.Controllers
                 var proposalDto = mapper.Map<ProposalDto>(proposal);
                 return Ok(proposalDto);
             }
-            catch (ArgumentException e)
+            catch(InvalidOperationException e)
             {
                 return BadRequest(e.Message);
             }
-            catch (DbUpdateException)
+            catch (ArgumentException e)
             {
-                return BadRequest("This Item already has a proposal, please submit a counter proposal");
+                return BadRequest(e.Message);
             }
             catch (Exception e)
             {

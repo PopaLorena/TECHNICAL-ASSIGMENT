@@ -51,7 +51,14 @@ namespace Assigment.Repositories
         /// <inheritdoc/>
         public async Task<Proposal> GetProposalById(Guid id)
         {
-            var proposalDao = await context.Proposals.Include(p=> p.InvolvedParties).FirstOrDefaultAsync(p=> p.Id == id).ConfigureAwait(false);
+            var proposalDao = await context.Proposals.Include(p => p.InvolvedParties).FirstOrDefaultAsync(p => p.Id == id).ConfigureAwait(false);
+            return mapper.Map<Proposal>(proposalDao);
+        }  
+        
+        /// <inheritdoc/>
+        public async Task<Proposal> GetProposalByItemId(Guid itemId)
+        {
+            var proposalDao = await context.Proposals.FirstOrDefaultAsync(p => p.ItemId == itemId).ConfigureAwait(false);
             return mapper.Map<Proposal>(proposalDao);
         }
     }

@@ -22,6 +22,13 @@ namespace Assigment.Interfaces.RepositoryInterfaces
         Task<List<Proposal>> GetAllNegotiationDetails(Guid itemId);
 
         /// <summary>
+        /// Retrieves a proposal by item ID.
+        /// </summary>
+        /// <param name="itemId">The ID of the Item of the proposal to retrieve.</param>
+        /// <returns>The proposal as the result.</returns>
+        Task<Proposal> GetProposalByItemId(Guid itemId);
+
+        /// <summary>
         /// Retrieves a proposal by its ID.
         /// </summary>
         /// <param name="id">The ID of the proposal to retrieve.</param>

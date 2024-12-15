@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Assigment.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241215170636_init")]
+    [Migration("20241215200332_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -176,8 +176,7 @@ namespace Assigment.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.HasIndex("ItemId")
-                        .IsUnique();
+                    b.HasIndex("ItemId");
 
                     b.ToTable("Proposals");
                 });

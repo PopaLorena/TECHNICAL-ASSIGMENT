@@ -37,7 +37,10 @@ namespace Assigment.Services
             var user = await userRepository.GetUserById(userId).ConfigureAwait(false);
             proposal.CreatedDate = DateTime.Now;
             proposal.CreatedByUserId = user!.Id;
-
+           var existingProposal = await proposalRepository.GetProposalByItemId(proposal.ItemId).ConfigureAwait(false);
+            if (existingProposal != null) {
+                throw new ArgumentException("This Item already has a proposal, please submit a counter proposal");
+            }
             proposal = await proposalRepository.AddProposal(proposal).ConfigureAwait(false);
 
             var partiesIds = await partyRepository.GetPartiesByItemIdAsync(proposal.ItemId).ConfigureAwait(false);

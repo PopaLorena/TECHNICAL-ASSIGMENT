@@ -226,8 +226,7 @@ namespace Assigment.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Proposals_ItemId",
                 table: "Proposals",
-                column: "ItemId",
-                unique: true);
+                column: "ItemId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",

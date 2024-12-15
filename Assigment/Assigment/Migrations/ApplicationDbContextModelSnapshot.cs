@@ -173,8 +173,7 @@ namespace Assigment.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.HasIndex("ItemId")
-                        .IsUnique();
+                    b.HasIndex("ItemId");
 
                     b.ToTable("Proposals");
                 });
