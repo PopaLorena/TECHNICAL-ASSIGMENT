@@ -21,12 +21,11 @@ jobs:
     - name: Run Build Script
       run: |
         pwsh ./build-app.ps1  
-        
-    - name: Publish Test Results
-      uses: microsoft/test-results-action@v2
-      with:
-        test-results: 'TECHNICAL-ASSIGMENT/Assigment/AssigmentTests/TestResults/test-results.trx'
-
+    
+    - name: Run tests and generate TRX report
+      run: |
+        dotnet test ./Assigment/Assigment.sln --configuration Release --logger "trx;LogFileName=test-results.trx"
+    
     - name: Upload test results
       uses: actions/upload-artifact@v3
       with:

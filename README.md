@@ -28,4 +28,14 @@ Before running the application, ensure you have the following installed:
 - **SQL Server** (or use an in-memory database for development)
 - **Postman/Swagger** for API testing
 
+## Build
+Run using powerhell
+
+- ./build-app.ps1
+
+
+## Run UnitTest
+Run using powerhell this line:
+-  dotnet test ./Assigment/Assigment.sln --configuration Release --logger "trx;LogFileName=test-results.trx"
+
 
