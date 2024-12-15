@@ -39,7 +39,7 @@ namespace AssigmentTests.ControllerTests
             _mapperMock.Setup(m => m.Map<List<ItemDto>>(items)).Returns(itemsDto);
 
             var userId = "test@example.com";
-            var claims = new List<Claim> { new(ClaimTypes.Email, userId) };
+            var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, userId) };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             _controller.ControllerContext = new ControllerContext
             {
@@ -87,7 +87,7 @@ namespace AssigmentTests.ControllerTests
                 .ThrowsAsync(new ArgumentException("Invalid argument"));
 
             var userId = "test@example.com";
-            var claims = new List<Claim> { new(ClaimTypes.Email, userId) };
+            var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, userId) };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             _controller.ControllerContext = new ControllerContext
             {
@@ -115,7 +115,7 @@ namespace AssigmentTests.ControllerTests
                 .ThrowsAsync(new Exception("Internal server error"));
 
             var userId = "test@example.com";
-            var claims = new List<Claim> { new(ClaimTypes.Email, userId) };
+            var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, userId) };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             _controller.ControllerContext = new ControllerContext
             {
@@ -160,7 +160,7 @@ namespace AssigmentTests.ControllerTests
         {
             // Arrange
             var userId = "test@example.com";
-            var claims = new List<Claim> { new(ClaimTypes.Email, userId) };
+            var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, userId) };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             _controller.ControllerContext = new ControllerContext
             {
@@ -193,7 +193,7 @@ namespace AssigmentTests.ControllerTests
         {
             // Arrange
             var userId = "test@example.com";
-            var claims = new List<Claim> { new(ClaimTypes.Email, userId) };
+            var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, userId) };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             _controller.ControllerContext = new ControllerContext
             {
@@ -215,7 +215,7 @@ namespace AssigmentTests.ControllerTests
         {
             // Arrange
             var userId = "test@example.com";
-            var claims = new List<Claim> { new(ClaimTypes.Email, userId) };
+            var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, userId) };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             _controller.ControllerContext = new ControllerContext
             {

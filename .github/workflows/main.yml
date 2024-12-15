@@ -21,4 +21,9 @@ jobs:
     - name: Run Build Script
       run: |
         pwsh ./build-app.ps1  
+        
+    - name: Upload test results to GitHub Actions
+      uses: sreechith-gh/junit-report-action@v1
+      with:
+        test_report: TECHNICAL-ASSIGMENT/Assigment/AssigmentTests/TestResults/test-results.xml
           
