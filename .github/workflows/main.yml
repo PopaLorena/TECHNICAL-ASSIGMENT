@@ -22,8 +22,9 @@ jobs:
       run: |
         pwsh ./build-app.ps1  
         
-    - name: Upload test results to GitHub Actions
-      uses: sreechith-gh/junit-report-action@v1
-      with:
-        test_report: TECHNICAL-ASSIGMENT/Assigment/AssigmentTests/TestResults/test-results.xml
-          
+    - name: Convert JUnit XML to CTRF JSON
+      run: |
+        npx junit-to-ctrf TECHNICAL-ASSIGMENT/Assigment/AssigmentTests/TestResults/test-results.xml ctrf/ctrf-report.json
+
+    - name: Publish Test Summary Results
+      run: npx github-actions-ctrf ctrf/ctrf-report.json   
