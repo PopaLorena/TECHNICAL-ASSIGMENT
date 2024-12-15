@@ -9,15 +9,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using System.Security.Claims;
+
 namespace AssigmentTests.ControllerTests
 {
+    [TestFixture]
     public class ItemControllerTests
     {
-        private readonly Mock<IItemService> _itemServiceMock;
-        private readonly Mock<IMapper> _mapperMock;
-        private readonly ItemController _controller;
+        private Mock<IItemService> _itemServiceMock;
+        private Mock<IMapper> _mapperMock;
+        private ItemController _controller;
 
-        public ItemControllerTests()
+        [SetUp]
+        public void Setup()
         {
             _itemServiceMock = new Mock<IItemService>();
             _mapperMock = new Mock<IMapper>();

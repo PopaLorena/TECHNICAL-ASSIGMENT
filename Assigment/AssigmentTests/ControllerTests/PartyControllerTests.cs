@@ -10,13 +10,15 @@ using Assigment.ModelsDto.GetModels;
 
 namespace AssigmentTests.ControllerTests
 {
+    [TestFixture]
     public class PartyControllerTests
     {
-        private readonly Mock<IPartyService> mockPartyService;
-        private readonly Mock<IMapper> mockMapper;
-        private readonly PartyController controller;
+        private Mock<IPartyService> mockPartyService;
+        private Mock<IMapper> mockMapper;
+        private PartyController controller;
 
-        public PartyControllerTests()
+        [SetUp]
+        public void Setup()
         {
             mockPartyService = new Mock<IPartyService>();
             mockMapper = new Mock<IMapper>();

@@ -23,7 +23,7 @@
         /// <summary>
         /// Gets or sets the comment associated with the counter proposal.
         /// </summary>
-        public required string Comment { get; set; }
+        public string Comment { get; set; }
 
         /// <summary>
         /// Gets or sets the payment details for the counter proposal.

@@ -10,15 +10,16 @@ using Moq;
 
 namespace AssigmentTests.ControllerTests
 {
+    [TestFixture]
     public class UserControllerTests
     {
-        private readonly Mock<IUserService> _mockUserService;
-        private readonly Mock<IMapper> _mockMapper;
-        private readonly UserController _controller;
+        private Mock<IUserService> _mockUserService;
+        private Mock<IMapper> _mockMapper;
+        private UserController _controller;
 
-        public UserControllerTests()
+        [SetUp]
+        public void Setup()
         {
-            // Initialize mocks
             _mockUserService = new Mock<IUserService>();
             _mockMapper = new Mock<IMapper>();
 

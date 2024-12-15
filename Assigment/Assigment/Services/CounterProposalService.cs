@@ -76,6 +76,7 @@ namespace Assigment.Services
                     throw new ArgumentException($"Invalid value for Payment.");
 
                 var cultureInfo = CultureInfo.GetCultureInfo("fr-FR");
+
                 return String.Format(cultureInfo, "{0:C} Euro", payment);
             }
             else
