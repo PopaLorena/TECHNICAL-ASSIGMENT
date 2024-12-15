@@ -4,6 +4,7 @@ using Assigment.Models;
 
 namespace Assigment.Services
 {
+    /// <inheritdoc/>
     public class ItemService : IItemService
     {
         private readonly IItemRepository itemRepository;
@@ -17,10 +18,12 @@ namespace Assigment.Services
             this.itemRepository = itemRepository ?? throw new ArgumentNullException(nameof(itemRepository));
         }
 
+        /// <inheritdoc/>
         public async Task<Item> AddItem(Item item)
         {
             item.CreatedDate = DateTime.UtcNow;
             List<Guid> partyIds = [];
+
             if (item.PartyIds.Count != 0)
             {
                 foreach (var partyId in item.PartyIds)
@@ -30,6 +33,7 @@ namespace Assigment.Services
                     partyIds.Add(partyId);
                 }
             }
+
             var newItemId = await itemRepository.AddItem(item).ConfigureAwait(false);
             if(partyIds.Count != 0)
                 await itemRepository.AddItemToParty(partyIds, newItemId).ConfigureAwait(false);
@@ -37,43 +41,33 @@ namespace Assigment.Services
             return await itemRepository.GetItemById(newItemId).ConfigureAwait(false);
         }
 
-        public async Task<List<Item>> GetAllItemsFromMyParty(string userEmail)
+        /// <inheritdoc/>
+        public async Task<List<Item>> GetAllItemsFromMyParty(string userId)
         {
-            var user = await userRepository.GetUserByEmail(userEmail).ConfigureAwait(false);
+            var user = await userRepository.GetUserById(userId).ConfigureAwait(false);
 
             return await itemRepository.GetAllItemsByPartyId(user.PartyId).ConfigureAwait(false);
         }
 
-        public async Task<List<Item>> GetFilteredAndSortedItems(Item item, string userEmail)
+        /// <inheritdoc/>
+        public async Task<List<Item>> GetFilteredAndSortedItems(Item item, string userId)
         {
-            if (item.SortBy is not ("Name" or "CreatedDate" or "IsShared"))
-            {
-                throw new ArgumentException($"Invalid value for SortBy. Allowed values are: 'Name', 'CreatedDate', 'IsShared'.");
-            }
-            if (item.SortOrder is not ("asc" or "desc"))
-            {
-                throw new ArgumentException($"Invalid value for SortOrder. Allowed values are: 'asc', 'desc'.");
-            }
+            ValidateSortInput(item.SortBy, item.SortOrder);
 
-            var user = await userRepository.GetUserByEmail(userEmail).ConfigureAwait(false);
+            var user = await userRepository.GetUserById(userId).ConfigureAwait(false);
 
             var query = await itemRepository.GetAllItemsByPartyId(user.PartyId).ConfigureAwait(false);
 
-            if (!string.IsNullOrEmpty(item.Name))
-            {
-                query = query.Where(i => i.Name!.Contains(item.Name)).ToList();
-            }
-            if (item.CreatedDate.HasValue)
-            {
-                query = query.Where(i => i.CreatedDate!.Value.Date == item.CreatedDate.Value.Date).ToList();
-            }
+            query = ApplyFilter(query, item);
 
-            if (item.IsShared.HasValue)
-            {
-                query = query.Where(i => i.IsShared == item.IsShared).ToList();
-            }
+           
+            query = ApplySorting(query, item);
 
-            // Apply sorting
+            return query;
+        }
+
+        private static List<Item> ApplySorting(List<Item> query, Item item)
+        {
             if (item.SortBy == "Name")
             {
                 query = item.SortOrder == "asc"
@@ -94,6 +88,37 @@ namespace Assigment.Services
             }
 
             return query;
+        }
+
+        private static List<Item> ApplyFilter(List<Item> query, Item item)
+        {
+            if (!string.IsNullOrEmpty(item.Name))
+            {
+                query = query.Where(i => i.Name!.Contains(item.Name)).ToList();
+            }
+            if (item.CreatedDate.HasValue)
+            {
+                query = query.Where(i => i.CreatedDate!.Value.Date == item.CreatedDate.Value.Date).ToList();
+            }
+
+            if (item.IsShared.HasValue)
+            {
+                query = query.Where(i => i.IsShared == item.IsShared).ToList();
+            }
+
+            return query;
+        }
+
+        private static void ValidateSortInput(string sortBy, string sortOrder)
+        {
+            if (sortBy is not ("Name" or "CreatedDate" or "IsShared"))
+            {
+                throw new ArgumentException($"Invalid value for SortBy. Allowed values are: 'Name', 'CreatedDate', 'IsShared'.");
+            }
+            if (sortOrder is not ("asc" or "desc"))
+            {
+                throw new ArgumentException($"Invalid value for SortOrder. Allowed values are: 'asc', 'desc'.");
+            }
         }
     }
 }

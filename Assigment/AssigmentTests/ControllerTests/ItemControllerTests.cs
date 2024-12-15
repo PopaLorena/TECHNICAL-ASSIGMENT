@@ -38,8 +38,8 @@ namespace AssigmentTests.ControllerTests
             _itemServiceMock.Setup(s => s.GetFilteredAndSortedItems(item, It.IsAny<string>())).ReturnsAsync(items);
             _mapperMock.Setup(m => m.Map<List<ItemDto>>(items)).Returns(itemsDto);
 
-            var userEmail = "test@example.com";
-            var claims = new List<Claim> { new(ClaimTypes.Email, userEmail) };
+            var userId = "test@example.com";
+            var claims = new List<Claim> { new(ClaimTypes.Email, userId) };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             _controller.ControllerContext = new ControllerContext
             {
@@ -86,8 +86,8 @@ namespace AssigmentTests.ControllerTests
             _itemServiceMock.Setup(s => s.GetFilteredAndSortedItems(item, It.IsAny<string>()))
                 .ThrowsAsync(new ArgumentException("Invalid argument"));
 
-            var userEmail = "test@example.com";
-            var claims = new List<Claim> { new(ClaimTypes.Email, userEmail) };
+            var userId = "test@example.com";
+            var claims = new List<Claim> { new(ClaimTypes.Email, userId) };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             _controller.ControllerContext = new ControllerContext
             {
@@ -114,8 +114,8 @@ namespace AssigmentTests.ControllerTests
             _itemServiceMock.Setup(s => s.GetFilteredAndSortedItems(item, It.IsAny<string>()))
                 .ThrowsAsync(new Exception("Internal server error"));
 
-            var userEmail = "test@example.com";
-            var claims = new List<Claim> { new(ClaimTypes.Email, userEmail) };
+            var userId = "test@example.com";
+            var claims = new List<Claim> { new(ClaimTypes.Email, userId) };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             _controller.ControllerContext = new ControllerContext
             {
@@ -159,8 +159,8 @@ namespace AssigmentTests.ControllerTests
         public async Task GetAllItemsFromMyParty_ReturnsOk_WithItems()
         {
             // Arrange
-            var userEmail = "test@example.com";
-            var claims = new List<Claim> { new(ClaimTypes.Email, userEmail) };
+            var userId = "test@example.com";
+            var claims = new List<Claim> { new(ClaimTypes.Email, userId) };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             _controller.ControllerContext = new ControllerContext
             {
@@ -192,8 +192,8 @@ namespace AssigmentTests.ControllerTests
         public async Task GetAllItemsFromMyParty_ReturnsBadRequest_WhenKeyNotFoundExceptionIsThrown()
         {
             // Arrange
-            var userEmail = "test@example.com";
-            var claims = new List<Claim> { new(ClaimTypes.Email, userEmail) };
+            var userId = "test@example.com";
+            var claims = new List<Claim> { new(ClaimTypes.Email, userId) };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             _controller.ControllerContext = new ControllerContext
             {
@@ -214,8 +214,8 @@ namespace AssigmentTests.ControllerTests
         public async Task GetAllItemsFromMyParty_ReturnsInternalServerError_WhenExceptionIsThrown()
         {
             // Arrange
-            var userEmail = "test@example.com";
-            var claims = new List<Claim> { new(ClaimTypes.Email, userEmail) };
+            var userId = "test@example.com";
+            var claims = new List<Claim> { new(ClaimTypes.Email, userId) };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             _controller.ControllerContext = new ControllerContext
             {

@@ -77,10 +77,10 @@ namespace AssigmentTests.ServiceTests
         public async Task GetAllItemsFromMyParty_ShouldReturnItems_WhenUserAndItemsExist()
         {
             // Arrange
-            var userEmail = "testuser@example.com";
+            var userId = "testuser@example.com";
             var user = new UserModel
             {
-                Email = userEmail,
+                Email = userId,
                 PartyId = Guid.NewGuid()
             };
             var items = new List<Item>
@@ -89,11 +89,11 @@ namespace AssigmentTests.ServiceTests
                 new() { Id = Guid.NewGuid(), Name = "Item 2" }
             };
 
-            _userRepositoryMock.Setup(repo => repo.GetUserByEmail(userEmail)).ReturnsAsync(user);
+            _userRepositoryMock.Setup(repo => repo.GetUserById(userId)).ReturnsAsync(user);
             _itemRepositoryMock.Setup(repo => repo.GetAllItemsByPartyId(user.PartyId)).ReturnsAsync(items);
 
             // Act
-            var result = await _itemService.GetAllItemsFromMyParty(userEmail);
+            var result = await _itemService.GetAllItemsFromMyParty(userId);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -109,24 +109,24 @@ namespace AssigmentTests.ServiceTests
         public async Task GetAllItemsFromMyParty_ShouldReturnEmptyList_WhenUserHasNoItems()
         {
             // Arrange
-            var userEmail = "testuser@example.com";
+            var userId = "testuser@example.com";
             var user = new UserModel
             {
-                Email = userEmail,
+                Email = userId,
                 PartyId = Guid.NewGuid()
             };
 
-            _userRepositoryMock.Setup(repo => repo.GetUserByEmail(userEmail)).ReturnsAsync(user);
+            _userRepositoryMock.Setup(repo => repo.GetUserById(userId)).ReturnsAsync(user);
             _itemRepositoryMock.Setup(repo => repo.GetAllItemsByPartyId(user.PartyId)).ReturnsAsync([]);
 
             // Act
-            var result = await _itemService.GetAllItemsFromMyParty(userEmail);
+            var result = await _itemService.GetAllItemsFromMyParty(userId);
 
             // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Empty);
 
-            _userRepositoryMock.Verify(repo => repo.GetUserByEmail(userEmail), Times.Once);
+            _userRepositoryMock.Verify(repo => repo.GetUserById(userId), Times.Once);
             _itemRepositoryMock.Verify(repo => repo.GetAllItemsByPartyId(user.PartyId), Times.Once);
         }
 
@@ -137,8 +137,8 @@ namespace AssigmentTests.ServiceTests
         public async Task GetFilteredAndSortedItems_ShouldReturnSortedItems_WhenValidSortOrderAndSortByAreProvided()
         {
             // Arrange
-            var userEmail = "testuser@example.com";
-            var user = new UserModel { Email = userEmail, PartyId = Guid.NewGuid() };
+            var userId = "testuser@example.com";
+            var user = new UserModel { Email = userId, PartyId = Guid.NewGuid() };
 
             var items = new List<Item>
             {
@@ -152,11 +152,11 @@ namespace AssigmentTests.ServiceTests
                 SortOrder = "asc"
             };
 
-            _userRepositoryMock.Setup(repo => repo.GetUserByEmail(userEmail)).ReturnsAsync(user);
+            _userRepositoryMock.Setup(repo => repo.GetUserById(userId)).ReturnsAsync(user);
             _itemRepositoryMock.Setup(repo => repo.GetAllItemsByPartyId(user.PartyId)).ReturnsAsync(items);
 
             // Act
-            var result = await _itemService.GetFilteredAndSortedItems(filterItem, userEmail);
+            var result = await _itemService.GetFilteredAndSortedItems(filterItem, userId);
 
             Assert.Multiple(() =>
             {
@@ -170,7 +170,7 @@ namespace AssigmentTests.ServiceTests
         public async Task GetFilteredAndSortedItems_ShouldThrowArgumentException_WhenInvalidSortByIsProvided()
         {
             // Arrange
-            var userEmail = "testuser@example.com";
+            var userId = "testuser@example.com";
             var filterItem = new Item
             {
                 SortBy = "InvalidSortField", // Invalid SortBy value
@@ -178,7 +178,7 @@ namespace AssigmentTests.ServiceTests
             };
 
             // Act & Assert
-            var ex = Assert.ThrowsAsync<ArgumentException>(() => _itemService.GetFilteredAndSortedItems(filterItem, userEmail));
+            var ex = Assert.ThrowsAsync<ArgumentException>(() => _itemService.GetFilteredAndSortedItems(filterItem, userId));
             Assert.That(ex.Message, Is.EqualTo("Invalid value for SortBy. Allowed values are: 'Name', 'CreatedDate', 'IsShared'."));
         }
 
@@ -186,7 +186,7 @@ namespace AssigmentTests.ServiceTests
         public async Task GetFilteredAndSortedItems_ShouldThrowArgumentException_WhenInvalidSortOrderIsProvided()
         {
             // Arrange
-            var userEmail = "testuser@example.com";
+            var userId = "testuser@example.com";
             var filterItem = new Item
             {
                 SortBy = "Name",
@@ -194,7 +194,7 @@ namespace AssigmentTests.ServiceTests
             };
 
             // Act & Assert
-            var ex = Assert.ThrowsAsync<ArgumentException>(() => _itemService.GetFilteredAndSortedItems(filterItem, userEmail));
+            var ex = Assert.ThrowsAsync<ArgumentException>(() => _itemService.GetFilteredAndSortedItems(filterItem, userId));
             Assert.That(ex.Message, Is.EqualTo("Invalid value for SortOrder. Allowed values are: 'asc', 'desc'."));
         }
 
@@ -202,8 +202,8 @@ namespace AssigmentTests.ServiceTests
         public async Task GetFilteredAndSortedItems_ShouldReturnFilteredItems_WhenValidFiltersAreProvided()
         {
             // Arrange
-            var userEmail = "testuser@example.com";
-            var user = new UserModel { Email = userEmail, PartyId = Guid.NewGuid() };
+            var userId = "testuser@example.com";
+            var user = new UserModel { Email = userId, PartyId = Guid.NewGuid() };
 
             var items = new List<Item>
             {
@@ -218,11 +218,11 @@ namespace AssigmentTests.ServiceTests
                 SortOrder = "asc"
             };
 
-            _userRepositoryMock.Setup(repo => repo.GetUserByEmail(userEmail)).ReturnsAsync(user);
+            _userRepositoryMock.Setup(repo => repo.GetUserById(userId)).ReturnsAsync(user);
             _itemRepositoryMock.Setup(repo => repo.GetAllItemsByPartyId(user.PartyId)).ReturnsAsync(items);
 
             // Act
-            var result = await _itemService.GetFilteredAndSortedItems(filterItem, userEmail);
+            var result = await _itemService.GetFilteredAndSortedItems(filterItem, userId);
 
             // Assert
             Assert.That(result, Has.Count.EqualTo(1));
@@ -233,8 +233,8 @@ namespace AssigmentTests.ServiceTests
         public async Task GetFilteredAndSortedItems_ShouldReturnEmptyList_WhenNoItemsMatchFilters()
         {
             // Arrange
-            var userEmail = "testuser@example.com";
-            var user = new UserModel { Email = userEmail, PartyId = Guid.NewGuid() };
+            var userId = "testuser@example.com";
+            var user = new UserModel { Email = userId, PartyId = Guid.NewGuid() };
 
             var items = new List<Item>
             {
@@ -249,11 +249,11 @@ namespace AssigmentTests.ServiceTests
                 SortOrder = "asc"
             };
 
-            _userRepositoryMock.Setup(repo => repo.GetUserByEmail(userEmail)).ReturnsAsync(user);
+            _userRepositoryMock.Setup(repo => repo.GetUserById(userId)).ReturnsAsync(user);
             _itemRepositoryMock.Setup(repo => repo.GetAllItemsByPartyId(user.PartyId)).ReturnsAsync(items);
 
             // Act
-            var result = await _itemService.GetFilteredAndSortedItems(filterItem, userEmail);
+            var result = await _itemService.GetFilteredAndSortedItems(filterItem, userId);
 
             // Assert
             Assert.That(result, Is.Empty);

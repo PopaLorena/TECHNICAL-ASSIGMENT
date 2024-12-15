@@ -6,8 +6,10 @@ using AutoMapper;
 
 namespace Assigment.AutoMapper
 {
+    ///<inheritdoc/>
     public class WebApiAutoMapperProfile : Profile
     {
+
         public WebApiAutoMapperProfile()
         {
             CreateMap<UserModel, CreateUserDto>().ReverseMap();
@@ -23,9 +25,19 @@ namespace Assigment.AutoMapper
             CreateMap<Item, CreateItemDto>().ReverseMap();
             CreateMap<Item, ItemFilterDto>().ReverseMap();
             CreateMap<Item, ItemDao>();
-
             CreateMap<ItemDao, Item>()
             .ForMember(dest => dest.PartyIds, opt => opt.MapFrom(src => src.ItemParties.Select(ip => ip.PartyId).ToList()));
+
+            CreateMap<Proposal, CreateProposalDto>().ReverseMap();
+            CreateMap<Proposal, ProposalDto>().ReverseMap();
+            CreateMap<Proposal, ProposalDao>().ReverseMap();
+
+            CreateMap<CounterProposal, CreateCounterProposalDto>().ReverseMap();
+            CreateMap<CounterProposal, CounterProposalDto>().ReverseMap();
+            CreateMap<CounterProposal, CounterProposalDao>().ReverseMap();
+
+            CreateMap<InvolvedParties, InvolvedPartiesDto>().ReverseMap();
+            CreateMap<InvolvedParties, InvolvedPartiesDao>().ReverseMap();
         }
     }
 }

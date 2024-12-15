@@ -7,18 +7,21 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-latest  
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+    - name: Checkout the repository
+      uses: actions/checkout@v3
 
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 8.0.x
+    - name: Set up .NET SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'  
 
-      - name: Build
-        run: |
-          cmd.exe /c ".\build-solution.bat"
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Run Build Script
+      run: |
+        pwsh ./build-app.ps1  
           

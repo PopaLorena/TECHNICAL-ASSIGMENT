@@ -146,32 +146,29 @@ namespace Assigment.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsAccepted = table.Column<bool>(type: "bit", nullable: true),
-                    PartyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProposalId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CounterProposalId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AcceptedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    PartyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ProposalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    AcceptedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_InvolvedParties", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_InvolvedParties_CounterProposal_CounterProposalId",
-                        column: x => x.CounterProposalId,
-                        principalTable: "CounterProposal",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_InvolvedParties_Parties_PartyId",
                         column: x => x.PartyId,
                         principalTable: "Parties",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_InvolvedParties_Proposals_ProposalId",
                         column: x => x.ProposalId,
                         principalTable: "Proposals",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_InvolvedParties_Users_AcceptedByUserId",
+                        column: x => x.AcceptedByUserId,
+                        principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -185,9 +182,9 @@ namespace Assigment.Migrations
                 column: "ProposalId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InvolvedParties_CounterProposalId",
+                name: "IX_InvolvedParties_AcceptedByUserId",
                 table: "InvolvedParties",
-                column: "CounterProposalId");
+                column: "AcceptedByUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InvolvedParties_PartyId",
@@ -229,7 +226,8 @@ namespace Assigment.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Proposals_ItemId",
                 table: "Proposals",
-                column: "ItemId");
+                column: "ItemId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
@@ -247,13 +245,13 @@ namespace Assigment.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "CounterProposal");
+
+            migrationBuilder.DropTable(
                 name: "InvolvedParties");
 
             migrationBuilder.DropTable(
                 name: "ItemParties");
-
-            migrationBuilder.DropTable(
-                name: "CounterProposal");
 
             migrationBuilder.DropTable(
                 name: "Proposals");

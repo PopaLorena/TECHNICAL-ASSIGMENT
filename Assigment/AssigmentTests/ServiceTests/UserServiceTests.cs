@@ -41,7 +41,7 @@ namespace AssigmentTests.ServiceTests
                 PasswordSalt = new byte[64],
                 PartyId = new Guid()
             };
-            _userRepositoryMock.Setup(r => r.GetUserByEmail(userModel.Email)).ReturnsAsync(userModel);
+            _userRepositoryMock.Setup(r => r.GetUserById(userModel.Email)).ReturnsAsync(userModel);
 
             // Act & Assert
             var ex = Assert.ThrowsAsync<InvalidOperationException>(async () => await userService.Login(userModel));
@@ -53,7 +53,7 @@ namespace AssigmentTests.ServiceTests
         {
             // Arrange
             var userModel = new UserModel { Email = "user@example.com", Password = "wrongpassword", PasswordHash = Encoding.UTF8.GetBytes("correctHash"), PasswordSalt = new byte[64] };
-            _userRepositoryMock.Setup(r => r.GetUserByEmail(userModel.Email)).ReturnsAsync(userModel);
+            _userRepositoryMock.Setup(r => r.GetUserById(userModel.Email)).ReturnsAsync(userModel);
 
             // Act & Assert
             var ex = Assert.ThrowsAsync<InvalidOperationException>(async () => await userService.Login(userModel));

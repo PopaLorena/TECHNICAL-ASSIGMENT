@@ -10,32 +10,41 @@ using System.Text;
 
 namespace Assigment.Services
 {
+    /// <inheritdoc/>
     public class UserService : IUserService
     {
         private readonly IUserRepository userRepository;
         private readonly IConfiguration configuration;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserService"/> class.
+        /// </summary>
+        /// <param name="configuration">The configuration object used for accessing application settings.</param>
+        /// <param name="userRepository">The repository that handles data operations related to users.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="configuration"/> or <paramref name="userRepository"/> is null.</exception>
         public UserService(IConfiguration configuration, IUserRepository userRepository)
         {
             this.userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
+        /// <inheritdoc/>
         public async Task<string> Login(UserModel user)
         {
-            var userDao = await userRepository.GetUserByEmail(user.Email).ConfigureAwait(false);
+            var oldUser = await userRepository.GetUserByEmail(user.Email).ConfigureAwait(false);
 
-            if (userDao == null)
+            if (oldUser == null)
                 throw new InvalidOperationException("Wrong credentials");
 
-            if (!VerifyPasswordHask(user.Password, userDao.PasswordHash!, userDao.PasswordSalt!))
+            if (!VerifyPasswordHask(user.Password, oldUser.PasswordHash!, oldUser.PasswordSalt!))
             {
                 throw new InvalidOperationException("Wrong credentials");
             }
 
-            return CreateToken(user);
+            return CreateToken(oldUser.Id);
         }
 
+        /// <inheritdoc/>
         public async Task<UserModel> Register(UserModel user)
         {
             CreatePassworHash(user.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -51,14 +60,15 @@ namespace Assigment.Services
             return await userRepository.Register(userDao).ConfigureAwait(false);
         }
 
-        private string CreateToken(UserModel user)
+
+        private string CreateToken(Guid id) 
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, id.ToString()),
             };
 
             var token = new JwtSecurityToken(

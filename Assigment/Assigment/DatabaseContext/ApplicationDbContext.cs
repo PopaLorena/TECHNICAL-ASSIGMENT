@@ -3,8 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Assigment.DatabaseContext
 {
+    ///<inheritdoc/>
     public class ApplicationDbContext : DbContext
     {
+        ///<inheritdoc/>
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
        : base(options)
         {
@@ -29,43 +31,37 @@ namespace Assigment.DatabaseContext
             // Configure InvolvedParties-Proposal relationship
             modelBuilder.Entity<ProposalDao>()
               .HasMany(p => p.InvolvedParties)
-              .WithOne()
+              .WithOne(ip => ip.Proposal)
               .HasForeignKey(u => u.ProposalId);
 
-            // Configure InvolvedParties-CounterProposal relationship
-            modelBuilder.Entity<CounterProposalDao>()
-              .HasMany(cp => cp.InvolvedParties)
-              .WithOne()
-              .HasForeignKey(u => u.CounterProposalId);
-              
             // Configure party-user relationship
             modelBuilder.Entity<PartyDao>()
                .HasMany(p => p.Users)
-               .WithOne()
+               .WithOne(u => u.Party)
                .HasForeignKey(u => u.PartyId);
 
             // Configure party-item relationship
             modelBuilder.Entity<PartyDao>()
                 .HasMany(p => p.ItemParties)
-                .WithOne()
+                .WithOne(ip => ip.Party)
                 .HasForeignKey(ip => ip.PartyId);
 
             modelBuilder.Entity<ItemDao>()
-                .HasMany(p => p.ItemParties)
-                .WithOne(i => i.Item)
+                .HasMany(i => i.ItemParties)
+                .WithOne(ip => ip.Item)
                 .HasForeignKey(ip => ip.ItemId);
 
             // Configure item-Proposal relationship
 
             modelBuilder.Entity<ItemDao>()
                 .HasMany(i => i.Proposals)
-                .WithOne()
+                .WithOne(p => p.Item)
                 .HasForeignKey(p => p.ItemId);
 
             // Configure Proposal-user relationship
             modelBuilder.Entity<UserDao>()
                 .HasMany(u => u.Proposals)
-                .WithOne()
+                .WithOne(p => p.CreatedByUser)
                 .HasForeignKey(p => p.CreatedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -79,8 +75,15 @@ namespace Assigment.DatabaseContext
             // Configure CounterProposal-user relationship
             modelBuilder.Entity<UserDao>()
                 .HasMany(u => u.CounterProposals)
-                .WithOne()
+                .WithOne(cp => cp.CreatedByUser)
                 .HasForeignKey(p => p.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure InvolvedParties-user relationship
+            modelBuilder.Entity<UserDao>()
+                .HasMany(u => u.InvolvedParties)
+                .WithOne(ip => ip.AcceptedByUser)
+                .HasForeignKey(p => p.AcceptedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Configure Unique props
@@ -95,6 +98,10 @@ namespace Assigment.DatabaseContext
             modelBuilder.Entity<PartyDao>()
                 .HasIndex(i => i.Name)
                 .IsUnique();
+
+            modelBuilder.Entity<ProposalDao>()
+               .HasIndex(i => i.ItemId)
+               .IsUnique();
 
             base.OnModelCreating(modelBuilder);
         }

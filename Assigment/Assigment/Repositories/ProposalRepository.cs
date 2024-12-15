@@ -7,16 +7,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Assigment.Repositories
 {
+    /// <inheritdoc/>
     public class ProposalRepository : IProposalRepository
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProposalRepository"/> class.
+        /// </summary>
+        /// <param name="context">The database context used for interacting with the database.</param>
+        /// <param name="mapper">The object mapper used to map between entities and DTOs.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="context"/> or <paramref name="mapper"/> is <c>null</c>.</exception>
         public ProposalRepository(ApplicationDbContext context, IMapper mapper)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        /// <inheritdoc/>
         public async Task<Proposal> AddProposal(Proposal proposal)
         {
             var proposalDao = mapper.Map<ProposalDao>(proposal);
@@ -27,28 +36,23 @@ namespace Assigment.Repositories
             return mapper.Map<Proposal>(proposalDao);
         }
 
+        /// <inheritdoc/>
         public async Task<List<Proposal>> GetAllNegotiationDetails(Guid itemId)
         {
-            var itemDetails = await context.Items
-                .Where(i => i.Id == itemId && i.IsShared)
-                .Include(i => i.Proposals)
-                    .ThenInclude(p => p.CounterProposals)
-                .ThenInclude(cp => cp.InvolvedParties)
-                .OrderBy(i => i.CreatedDate)
-                .FirstOrDefaultAsync();
+            var proposals = await context.Proposals
+                .Where(p => p.ItemId == itemId) 
+                .Include(p => p.InvolvedParties) 
+                .Include(p => p.CounterProposals) 
+                .ToListAsync().ConfigureAwait(false);
 
-            if (itemDetails != null)
-            {
-                var proposalsWithCounterProposals = itemDetails.Proposals
-                    .OrderBy(p => p.CreatedDate)
-                    .Select(p => new
-                    {
-                        Proposal = p,
-                        CounterProposals = p.CounterProposals.OrderBy(cp => cp.CreatedDate).ToList()
-                    })
-                    .ToList();
-            }
-            return mapper.Map<List<Proposal>>(itemDetails?.Proposals); 
+            return mapper.Map<List<Proposal>>(proposals); 
+        }
+
+        /// <inheritdoc/>
+        public async Task<Proposal> GetProposalById(Guid id)
+        {
+            var proposalDao = await context.Proposals.Include(p=> p.InvolvedParties).FirstOrDefaultAsync(p=> p.Id == id).ConfigureAwait(false);
+            return mapper.Map<Proposal>(proposalDao);
         }
     }
 }

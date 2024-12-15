@@ -15,7 +15,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -76,6 +81,12 @@ builder.Services.AddScoped<IPartyRepository, PartyRepository>();
 builder.Services.AddScoped<IPartyService, PartyService>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IItemService, ItemService>();
+builder.Services.AddScoped<IProposalRepository, ProposalRepository>();
+builder.Services.AddScoped<IProposalService, ProposalService>();
+builder.Services.AddScoped<IInvolvedPartyRepository, InvolvedPartyRepository>();
+builder.Services.AddScoped<IInvolvedPartyService, InvolvedPartyService>();
+builder.Services.AddScoped<ICounterProposalRepository, CounterProposalRepository>();
+builder.Services.AddScoped<ICounterProposalService, CounterProposalService>();
 
 var app = builder.Build();
 

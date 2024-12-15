@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Assigment.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241214212940_init")]
+    [Migration("20241215170636_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -63,24 +63,21 @@ namespace Assigment.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AcceptedByUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CounterProposalId")
+                    b.Property<Guid?>("AcceptedByUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool?>("IsAccepted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("PartyId")
+                    b.Property<Guid?>("PartyId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ProposalId")
+                    b.Property<Guid?>("ProposalId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CounterProposalId");
+                    b.HasIndex("AcceptedByUserId");
 
                     b.HasIndex("PartyId");
 
@@ -179,7 +176,8 @@ namespace Assigment.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.HasIndex("ItemId");
+                    b.HasIndex("ItemId")
+                        .IsUnique();
 
                     b.ToTable("Proposals");
                 });
@@ -221,7 +219,7 @@ namespace Assigment.Migrations
 
             modelBuilder.Entity("Assigment.ModelsDao.CounterProposalDao", b =>
                 {
-                    b.HasOne("Assigment.ModelsDao.UserDao", null)
+                    b.HasOne("Assigment.ModelsDao.UserDao", "CreatedByUser")
                         .WithMany("CounterProposals")
                         .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -232,27 +230,28 @@ namespace Assigment.Migrations
                         .HasForeignKey("ProposalId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CreatedByUser");
                 });
 
             modelBuilder.Entity("Assigment.ModelsDao.InvolvedPartiesDao", b =>
                 {
-                    b.HasOne("Assigment.ModelsDao.CounterProposalDao", null)
+                    b.HasOne("Assigment.ModelsDao.UserDao", "AcceptedByUser")
                         .WithMany("InvolvedParties")
-                        .HasForeignKey("CounterProposalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AcceptedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Assigment.ModelsDao.PartyDao", null)
                         .WithMany("InvolvedParties")
-                        .HasForeignKey("PartyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PartyId");
 
-                    b.HasOne("Assigment.ModelsDao.ProposalDao", null)
+                    b.HasOne("Assigment.ModelsDao.ProposalDao", "Proposal")
                         .WithMany("InvolvedParties")
-                        .HasForeignKey("ProposalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProposalId");
+
+                    b.Navigation("AcceptedByUser");
+
+                    b.Navigation("Proposal");
                 });
 
             modelBuilder.Entity("Assigment.ModelsDao.ItemPartyDao", b =>
@@ -263,42 +262,45 @@ namespace Assigment.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Assigment.ModelsDao.PartyDao", null)
+                    b.HasOne("Assigment.ModelsDao.PartyDao", "Party")
                         .WithMany("ItemParties")
                         .HasForeignKey("PartyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Item");
+
+                    b.Navigation("Party");
                 });
 
             modelBuilder.Entity("Assigment.ModelsDao.ProposalDao", b =>
                 {
-                    b.HasOne("Assigment.ModelsDao.UserDao", null)
+                    b.HasOne("Assigment.ModelsDao.UserDao", "CreatedByUser")
                         .WithMany("Proposals")
                         .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Assigment.ModelsDao.ItemDao", null)
+                    b.HasOne("Assigment.ModelsDao.ItemDao", "Item")
                         .WithMany("Proposals")
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("Item");
                 });
 
             modelBuilder.Entity("Assigment.ModelsDao.UserDao", b =>
                 {
-                    b.HasOne("Assigment.ModelsDao.PartyDao", null)
+                    b.HasOne("Assigment.ModelsDao.PartyDao", "Party")
                         .WithMany("Users")
                         .HasForeignKey("PartyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
 
-            modelBuilder.Entity("Assigment.ModelsDao.CounterProposalDao", b =>
-                {
-                    b.Navigation("InvolvedParties");
+                    b.Navigation("Party");
                 });
 
             modelBuilder.Entity("Assigment.ModelsDao.ItemDao", b =>
@@ -327,6 +329,8 @@ namespace Assigment.Migrations
             modelBuilder.Entity("Assigment.ModelsDao.UserDao", b =>
                 {
                     b.Navigation("CounterProposals");
+
+                    b.Navigation("InvolvedParties");
 
                     b.Navigation("Proposals");
                 });
