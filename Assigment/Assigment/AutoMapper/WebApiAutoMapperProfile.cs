@@ -31,6 +31,7 @@ namespace Assigment.AutoMapper
             CreateMap<Proposal, CreateProposalDto>().ReverseMap();
             CreateMap<Proposal, ProposalDto>().ReverseMap();
             CreateMap<Proposal, ProposalDao>().ReverseMap();
+            CreateMap<Proposal, UpdateProposalDto>().ReverseMap();
 
             CreateMap<CounterProposal, CreateCounterProposalDto>().ReverseMap();
             CreateMap<CounterProposal, CounterProposalDto>().ReverseMap();

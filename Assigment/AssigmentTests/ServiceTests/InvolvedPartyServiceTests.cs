@@ -52,7 +52,7 @@ namespace AssigmentTests.ServiceTests
             var proposalId = Guid.NewGuid();
             var userId = "user-123";
             var user = new UserModel { Id = Guid.NewGuid(), PartyId = Guid.NewGuid() };
-            var proposal = new Proposal { CreatedByUserId = user.PartyId, InvolvedParties = new List<InvolvedParties>() };
+            var proposal = new Proposal { CreatedByUserId = user.Id, InvolvedParties = new List<InvolvedParties>() };
 
             _mockUserRepository.Setup(repo => repo.GetUserById(userId)).ReturnsAsync(user);
             _mockProposalRepository.Setup(repo => repo.GetProposalById(proposalId)).ReturnsAsync(proposal);

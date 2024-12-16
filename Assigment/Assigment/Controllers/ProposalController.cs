@@ -70,6 +70,52 @@ namespace Assigment.Controllers
         }
 
         /// <summary>
+        /// Update your proposal. After that all of the response will be reseted 
+        /// </summary>
+        /// <param name="proposalId">The id of the proposal you wnt to update</param>
+        /// <param name="updateProposalDto">The details of the proposal to update.</param>
+        /// <returns>The updated proposal.</returns>
+        /// <response code="200">Successfully updated the proposal.</response>
+        /// <response code="400">Bad request - Invalid proposal data</response>
+        /// <response code="500">Internal server error.</response>
+        [HttpPut("update/{proposalId}")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [SwaggerOperation(Summary = "update your proposal.")]
+        [ProducesResponseType(typeof(ProposalDto), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> CreateProposal(Guid proposalId, [FromBody] UpdateProposalDto updateProposalDto)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userId == null)
+                {
+                    return Unauthorized("User not found.");
+                }
+                var proposal = mapper.Map<Proposal>(updateProposalDto);
+                proposal.Id = proposalId;
+                proposal = await proposalService.UpdateProposal(proposal, userId).ConfigureAwait(false);
+
+                var proposalDto = mapper.Map<ProposalDto>(proposal);
+                return Ok(proposalDto);
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e);
+            }
+        }
+
+        /// <summary>
         /// Creates a new proposal.
         /// </summary>
         /// <param name="createProposalDto">The details of the proposal to create.</param>

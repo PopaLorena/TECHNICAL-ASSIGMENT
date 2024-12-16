@@ -28,6 +28,11 @@ namespace Assigment.Models
         public DateTime CreatedDate { get; set; }
 
         /// <summary>
+        /// Gets or sets the updating date of the proposal.
+        /// </summary>
+        public DateTime UpdatedDate { get; set; }
+
+        /// <summary>
         /// Gets or sets the payment information related to this proposal.
         /// </summary>
         public string Payment { get; set; } = string.Empty;

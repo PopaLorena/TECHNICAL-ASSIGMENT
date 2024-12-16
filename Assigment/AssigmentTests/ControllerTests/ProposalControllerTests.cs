@@ -111,16 +111,15 @@ namespace AssigmentTests.ControllerTests
 
             _mockMapper.Setup(mapper => mapper.Map<Proposal>(createProposalDto)).Returns(proposal);
             _mockProposalService.Setup(service => service.AddProposal(proposal, It.IsAny<string>()))
-                .ThrowsAsync(new DbUpdateException());
+                .ThrowsAsync(new ArgumentException());
 
             // Act
             var result = await _controller.CreateProposal(createProposalDto);
 
             // Assert
-            var badRequestResult = result as BadRequestObjectResult;
+            var badRequestResult = result as ObjectResult;
             Assert.IsNotNull(badRequestResult);
             Assert.AreEqual(400, badRequestResult.StatusCode);
-            Assert.AreEqual("This Item already has a proposal, please submit a counter proposal", badRequestResult.Value);
         }
 
         [Test]

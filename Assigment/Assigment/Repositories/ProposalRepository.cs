@@ -3,6 +3,7 @@ using Assigment.Interfaces.RepositoryInterfaces;
 using Assigment.Models;
 using Assigment.ModelsDao;
 using AutoMapper;
+using Azure;
 using Microsoft.EntityFrameworkCore;
 
 namespace Assigment.Repositories
@@ -42,6 +43,7 @@ namespace Assigment.Repositories
             var proposals = await context.Proposals
                 .Where(p => p.ItemId == itemId) 
                 .Include(p => p.InvolvedParties) 
+                    .ThenInclude(ip => ip.AcceptedByUser)
                 .Include(p => p.CounterProposals) 
                 .ToListAsync().ConfigureAwait(false);
 
@@ -59,6 +61,32 @@ namespace Assigment.Repositories
         public async Task<Proposal> GetProposalByItemId(Guid itemId)
         {
             var proposalDao = await context.Proposals.FirstOrDefaultAsync(p => p.ItemId == itemId).ConfigureAwait(false);
+            return mapper.Map<Proposal>(proposalDao);
+        }
+
+        /// <inheritdoc/>
+        public async Task<Proposal> UpdateProposal(Proposal proposal)
+        {
+            var proposalDao = context.Proposals.FirstOrDefault(p => p.Id == proposal.Id);
+
+            if (proposalDao != null)
+            {
+                var involvedParties = mapper.Map<List<InvolvedPartiesDao>>(proposal.InvolvedParties);
+                proposalDao.Comment = proposal.Comment;
+                proposalDao.Payment = proposal.Payment;
+
+                foreach (var involvedParty in proposalDao.InvolvedParties)
+                {
+                    var involvedPartyDao = context.InvolvedParties.FirstOrDefault(p => p.Id == involvedParty.Id);
+
+                    involvedPartyDao.IsAccepted = null;
+                    involvedPartyDao.AcceptedByUserId = null;
+                    involvedPartyDao.AcceptedByUser = null;
+                }
+
+                await context.SaveChangesAsync().ConfigureAwait(false);
+            }
+
             return mapper.Map<Proposal>(proposalDao);
         }
     }

@@ -31,7 +31,7 @@ namespace Assigment.Models
         /// <summary>
         /// Gets or sets the identifier of the user who accepted or rejected the involved party.
         /// </summary>
-        public Guid AcceptedByUserId { get; set; }
+        public Guid? AcceptedByUserId { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the user who accepted or rejected the involved party.

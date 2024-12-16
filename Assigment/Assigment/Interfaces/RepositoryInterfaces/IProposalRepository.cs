@@ -34,6 +34,13 @@ namespace Assigment.Interfaces.RepositoryInterfaces
         /// <param name="id">The ID of the proposal to retrieve.</param>
         /// <returns>The proposal as the result.</returns>
         Task<Proposal> GetProposalById(Guid id);
+
+        /// <summary>
+        /// Update a proposal.
+        /// </summary>
+        /// <param name="proposal">The proposal to be updated.</param>
+        /// <returns>The updated proposal on success.</returns>
+        Task<Proposal> UpdateProposal(Proposal proposal);
     }
 
 }

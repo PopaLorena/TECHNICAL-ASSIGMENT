@@ -26,6 +26,11 @@
         public DateTime CreatedDate { get; set; }
 
         /// <summary>
+        /// Gets or sets the updating date of the proposal.
+        /// </summary>
+        public DateTime UpdatedDate { get; set; }
+
+        /// <summary>
         /// Gets or sets the payment details associated with the proposal.
         /// </summary>
         public string Payment { get; set; } = string.Empty;

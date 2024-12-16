@@ -30,12 +30,32 @@ namespace Assigment.Services
         }
 
         /// <inheritdoc/>
+        public async Task<Proposal> UpdateProposal(Proposal proposal, string userId)
+        {
+            proposal.Payment = FormatPayment(proposal.PaymentType, proposal.Payment);
+            proposal.UpdatedDate = DateTime.Now;
+            var oldProposal = await proposalRepository.GetProposalById(proposal.Id).ConfigureAwait(false);
+            if (proposal == null)
+            {
+                throw new KeyNotFoundException("the Proposal does not exist");
+            }
+
+            if(oldProposal.CreatedByUserId.ToString() != userId)
+            {
+                throw new UnauthorizedAccessException("Can't update a proposal that was not created by you");
+            }
+
+            return await proposalRepository.UpdateProposal(proposal).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc/>
         public async Task<Proposal> AddProposal(Proposal proposal, string userId)
         {
             proposal.Payment = FormatPayment(proposal.PaymentType, proposal.Payment);
 
             var user = await userRepository.GetUserById(userId).ConfigureAwait(false);
             proposal.CreatedDate = DateTime.Now;
+            proposal.UpdatedDate = DateTime.Now;
             proposal.CreatedByUserId = user!.Id;
            var existingProposal = await proposalRepository.GetProposalByItemId(proposal.ItemId).ConfigureAwait(false);
             if (existingProposal != null) {

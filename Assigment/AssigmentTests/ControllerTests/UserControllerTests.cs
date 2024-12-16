@@ -147,7 +147,6 @@ namespace AssigmentTests.ControllerTests
             {
                 Name = "John Doe",
                 Email = "john.doe@example.com",
-                Password = "Password123!",
                 PartyId = Guid.NewGuid()
             };
 
