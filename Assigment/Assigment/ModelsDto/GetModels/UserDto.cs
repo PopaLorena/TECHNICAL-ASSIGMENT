@@ -20,11 +20,6 @@
         /// </summary>
         public string Email { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Gets or sets the password of the user.
-        /// </summary>
-        public string Password { get; set; } = string.Empty;
-
 
         /// <summary>
         /// Gets or sets the unique identifier of the party the user is associated with.

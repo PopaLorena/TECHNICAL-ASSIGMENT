@@ -24,7 +24,7 @@ namespace Assigment.ModelsDto.CreateModels
 
         /// <summary>
         /// Gets or sets the password for the user account.
-        /// </summary
+        /// </summary>
         /// <example>P@ssw0rd123!</example>
         [Required(ErrorMessage = "Password is required")]
         public required string Password { get; set; }
